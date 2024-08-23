@@ -67,7 +67,10 @@ export const getListingPost = async (req, res, next) => {
     const offer = req.query.offer || "";
     const parking = req.query.parking || "";
     const furnished = req.query.furnished || "";
+    const minPrice = req.query.minPrice || "";
+    const maxPrice = req.query.maxPrice || "";
     const page = req.query.page || 1;
+
 
     const query = {
       $or: [
@@ -89,15 +92,24 @@ export const getListingPost = async (req, res, next) => {
     if (furnished === "true") {
       query.furnished = true;
     }
+    // Handle minPrice and maxPrice
+    if (minPrice && !isNaN(minPrice)) {
+      query.price = { ...query.price, $gte: Number(minPrice) };
+    }
+    if (maxPrice && !isNaN(maxPrice)) {
+      query.price = { ...query.price, $lte: Number(maxPrice) };
+    }
 
     const limit = 12;
     const pageNumber = parseInt(page);
 
     const skip = (pageNumber - 1) * limit;
 
-    const listings = await Listing.find(query).skip(skip).limit(limit);
+    const listings = await Listing.find(query)
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json(listings);
+    res.json({ success: true, data: listings });
   } catch (error) {
     next(error);
   }
