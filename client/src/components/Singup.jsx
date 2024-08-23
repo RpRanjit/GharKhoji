@@ -44,7 +44,6 @@ const Signup = ({ userState }) => {
             This field is required
           </span>
         )}
-        
 
         <input
           {...register("email", { required: true })}
@@ -52,7 +51,6 @@ const Signup = ({ userState }) => {
           placeholder="Email"
           className="form_input mt-5"
         />
-        
 
         {errors.email && (
           <span className="text-red-700 font-semibold text-sm mb-2 mt-1">
@@ -62,7 +60,17 @@ const Signup = ({ userState }) => {
 
         <div className="relative mt-5">
           <input
-            {...register("password", { required: true })}
+            {...register(
+              "password",
+              {
+                required:true,
+                pattern: {
+                  value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 
+                  message:
+                    "Password must be at least 8 characters long, include letters and numbers",
+                },
+              }
+            )}
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="form_input"
@@ -80,7 +88,7 @@ const Signup = ({ userState }) => {
         </div>
         {errors.password && (
           <span className="text-red-700 font-semibold text-sm mb-2 mt-1">
-            This field is required
+            Password must be at least 8 characters long, include letters and numbers
           </span>
         )}
 

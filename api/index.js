@@ -86,7 +86,7 @@ export const io = new Server(expressServer, {
 
 
 io.on("connection", (socket) => {
-  console.log(`socket connected with ${socket.id}`);
+  // console.log(`socket connected with ${socket.id}`);
 
   //=======Messaging Feature Here ======//
   socket.on("join_room", (chatId) => {
