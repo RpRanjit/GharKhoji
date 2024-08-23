@@ -27,13 +27,15 @@ const Search = () => {
   });
   const dispatch = useDispatch();
   const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
     dispatch(setSearchTermState(""));
     setFormState({
       searchTerm: "",
       parking: false,
       type: "all",
       furnished: false,
-
       offer: false,
     });
   };
@@ -42,7 +44,42 @@ const Search = () => {
     (async () => {
       try {
         setLoading(true);
+      offer: false,
+    });
+  };
 
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `/api/posts?searchTerm=${searchTermState}&type=${formState.type}&parking=${formState.parking}&furnished=${formState.furnished}&offer=${formState.offer}&page=${pageCount}`
+        );
+        const json = await res.json();
+        if (json.success === false) {
+          setLoading(false);
+        } else {
+          setListings(json);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    })();
+  }, [formState, searchTermState, pageCount]);
+
+  const handleChange = (name, value) => {
+    setPageCount(1);
+    setFormState({
+      ...formState,
+      [name]: value,
+    });
+  };
+
+  useEffect(() => {
+    scrollRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [listings]);
 
       // Ensure minPrice and maxPrice are valid numbers or undefined
  const minPrice = formState.minPrice || "";
@@ -80,6 +117,7 @@ const Search = () => {
   useEffect(() => {
     scrollRef.current.scrollIntoView({ behavior: "smooth" });
   }, [listings]);
+
 
   return (
     <>
@@ -157,6 +195,7 @@ const Search = () => {
                         </div>
                       </div>
 
+
                       {/* // Amenities Section  */}
                       <div className="aminities_container mt-4">
                         <p className="text-lg font-heading">Amenities:</p>
@@ -218,6 +257,44 @@ const Search = () => {
                         </div>
                       </div>
                       {/* Offer Section */}
+
+
+                      {/* // Amenities Section  */}
+                      <div className="aminities_container mt-4">
+                        <p className="text-lg font-heading">Amenities:</p>
+                        <div className="control flex flex-row md:flex-col items-center md:items-start xl:flex-row xl:items-center justify-start mt-1">
+                          <div className="mr-5">
+                            <label className="flex items-center justify-start text-lg font-heading">
+                              <input
+                                className="h-4 w-4 mr-1 accent-brand-blue"
+                                type="checkbox"
+                                name="parking"
+                                onChange={(e) =>
+                                  handleChange(e.target.name, e.target.checked)
+                                }
+                                checked={formState.parking}
+                              />
+                              Parking
+                            </label>
+                          </div>
+                          <div>
+                            <label className="flex items-center justify-start text-lg font-heading">
+                              <input
+                                className="h-4 w-4 mr-1 accent-brand-blue"
+                                type="checkbox"
+                                name="furnished"
+                                onChange={(e) =>
+                                  handleChange(e.target.name, e.target.checked)
+                                }
+                                checked={formState.furnished}
+                              />
+                              Furnished
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+
                       <div className="offer_container mt-8 ">
                         <div>
                           <label className="flex items-center justify-start text-lg font-heading">
@@ -289,8 +366,11 @@ const Search = () => {
                           <button
                             onClick={() => setPageCount(pageCount + 1)}
                             disabled={listings.length < 4 || loading}
+
                             className="join-item btn bg-brand-blue text-white hover:bg-brand-blue/90
                                                     disabled:bg-[#d5d5d5] disabled:text-[#a0a0a0]"
+
+                            className="join-item btn bg-brand-blue text-white hover:bg-brand-blue/90 disabled:bg-[#d5d5d5] disabled:text-[#a0a0a0]"
                           >
                             <FaAngleDoubleRight />
                           </button>
